@@ -4,23 +4,32 @@
 #include <vector>
 #include <iomanip>
 #include <stdlib.h>
+#include <sstream>
+#include <bitset>
+#include <map>
+#include <math.h>
 
 using namespace std;
 
 string counterName[8] = { "SN0","WN1","WN2","WN3","WT3","WT2","WT1","ST0" };
 struct datas {
-	string history="000"; //3-bits history
-	int counter[8]={};
+	string history = "000"; //3-bits history
+	int counter[8] = {};
 };
-string fileContent; //¦scode
-
+struct data_ {
+	string address;
+	string operators;
+	string code;
+	string move;
+};
+vector<data_> fileContent[10]; //å­˜code
+vector<string> tagName;
 datas BTB;
 
-
-//Â²©öª© s¥u·|¦³¤@¦æ
+//ç°¡æ˜“ç‰ˆ såªæœƒæœ‰ä¸€è¡Œ
 int compute(string s)
 {
-	int decimal = (int(s[0])-48) * 4 + (int(s[1])-48) * 2 + (int(s[2])-48) * 1;
+	int decimal = (int(s[0]) - 48) * 4 + (int(s[1]) - 48) * 2 + (int(s[2]) - 48) * 1;
 	return decimal;
 }
 void predictor(string s)
@@ -28,12 +37,12 @@ void predictor(string s)
 	int miss = 0;
 	for (int i = 0; i < s.size(); i++)
 	{
-		//§ïhistoryªº­È
+		//æ”¹historyçš„å€¼
 		int a = i - 3;
 		if (a < 0) a = 0;
 		for (int j = i - 1, x = 2; j >= a; j--, x--) {
 			if (s[j] == 'T') BTB.history[x] = '1';
-			else BTB.history[x]='0';
+			else BTB.history[x] = '0';
 		}
 
 		cout << BTB.history << " ";
@@ -44,81 +53,44 @@ void predictor(string s)
 		cout << counterName[BTB.counter[7]] << " ";
 		int n = compute(BTB.history);
 		string pred = counterName[BTB.counter[n]];
-		
-		cout <<setw(5) << pred[1] << setw(11) << s[i];
+
+		cout << setw(5) << pred[1] << setw(11) << s[i];
 		if (pred[1] != s[i])
-			cout << setw(9)<<"miss" << endl;
+			cout << setw(9) << "miss" << endl;
 		else
-			cout << setw(12)<<"not miss" << endl;
-		//§ïÅÜ¤U¤@¦¸ªº­È
+			cout << setw(12) << "not miss" << endl;
+		//æ”¹è®Šä¸‹ä¸€æ¬¡çš„å€¼
 		if (s[i] == 'T')
 		{
-			
+
 			if (BTB.counter[n] < 7)
 				BTB.counter[n]++;
 
 		}
+		else if(s[i] == 'N')
+		{
+			if (BTB.counter[n] > 0)
+				BTB.counter[n]--;
+		}
 	}
 }
 
-//°ª¤Àª©
-//void addressToBinary()
-//{
-//
-//}
-//void predictor()
-//{
-//	for (int i = 0; i < fileContent.size(); i++)
-//	{
-//		//¥h°£¦h¾lªÅ¥Õ
-//		for (int x = 0; x < fileContent[i].size(); x++)
-//		{
-//			if (fileContent[i][x] == ' ' && fileContent[i][x + 1] == ' ')
-//			{
-//				string::iterator it = fileContent[i].begin()+x;
-//				fileContent[i].erase(it);
-//
-//			}
-//		}
-//		string::size_type begin, end;
-//		end = fileContent[i].find(' ');
-//
-//
-//	}
-//}
-
-
 int main()
 {
-	
-
-	int choose; //¿é¤J0:Â²©öª© ¿é¤J1:°ª¤Àª©
-	cout << "choose:";
-	cin >> choose;
-	cout << endl;
-	//read file
 	ifstream infile;
-	infile.open("outcome.txt"); //¨Ï¥Î¦P¤@­ÓÀÉ®× ©Ò¥H­n°O±o§ïÀÉ®×¤º®e!
+	infile.open("outcome.txt"); //ä½¿ç”¨åŒä¸€å€‹æª”æ¡ˆ æ‰€ä»¥è¦è¨˜å¾—æ”¹æª”æ¡ˆå…§å®¹!
 	if (!infile.is_open()) {
 		cout << "Failed to open file.\n";
 	}
-	else if(choose==0) //Â²©öª©ÅªÀÉ
+	else//ç°¡æ˜“ç‰ˆè®€æª”
 	{
 		string s;
-
 		getline(infile, s);
-		//infile.close();
-
 		cout << setw(46) << "prediction" << setw(9) << "outcome" << setw(7) << "miss?" << endl;
 		predictor(s);
 	}
 	
 	infile.close();
-
-	
-	
-	
-
 
 	return 0;
 }
